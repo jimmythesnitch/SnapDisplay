@@ -1,93 +1,108 @@
 #!/usr/bin/env python3
-from core.config import Config
 
-config = Config()
 import os
+import sys
 
-# Don't let SDL/Pygame grab the audio device
+# Configure SDL BEFORE importing pygame.
 os.environ["SDL_AUDIODRIVER"] = "dummy"
 
-import sys
 import pygame
 
-pygame.init()
+from core.config import Config
 
-DISPLAY = pygame.display.Info()
-SCREEN_W = DISPLAY.current_w
-SCREEN_H = DISPLAY.current_h
+VERSION = "0.1.1"
 
-# Internal rendering resolution
-RENDER_W = 1280
-RENDER_H = 720
+BACKGROUND = (8, 8, 8)
+WHITE = (255, 255, 255)
+GRAY = (180, 180, 180)
+BLUE = (120, 220, 255)
 
-screen = pygame.display.set_mode(
-    (SCREEN_W, SCREEN_H),
-    pygame.FULLSCREEN
-)
 
-virtual = pygame.Surface((RENDER_W, RENDER_H))
+def main():
+    config = Config()
 
-pygame.display.set_caption("SnapDisplay")
+    pygame.init()
 
-clock = pygame.time.Clock()
+    display = pygame.display.Info()
+    screen_width = display.current_w
+    screen_height = display.current_h
 
-TITLE = pygame.font.SysFont("DejaVu Sans", 60, bold=True)
-SMALL = pygame.font.SysFont("DejaVu Sans", 28)
+    screen = pygame.display.set_mode(
+        (screen_width, screen_height),
+        pygame.FULLSCREEN,
+    )
 
-running = True
+    pygame.display.set_caption("SnapDisplay")
 
-while running:
+    clock = pygame.time.Clock()
 
-    for event in pygame.event.get():
+    title_font = pygame.font.SysFont("DejaVu Sans", 60, bold=True)
+    small_font = pygame.font.SysFont("DejaVu Sans", 28)
 
-        if event.type == pygame.QUIT:
-            running = False
+    running = True
 
-        if event.type == pygame.KEYDOWN:
+    while running:
 
-            if event.key == pygame.K_ESCAPE:
+        for event in pygame.event.get():
+
+            if event.type == pygame.QUIT:
                 running = False
 
-    # Draw everything to the virtual screen
-    virtual.fill((8, 8, 8))
+            elif event.type == pygame.KEYDOWN:
 
-    title = TITLE.render("SnapDisplay", True, (255, 255, 255))
-    version = SMALL.render("Version 0.1.1", True, (180, 180, 180))
-    status = SMALL.render("Waiting for Home Assistant...", True, (120, 220, 255))
+                if event.key == pygame.K_ESCAPE:
+                    running = False
 
-    virtual.blit(
-        title,
-        (
-            RENDER_W // 2 - title.get_width() // 2,
-            RENDER_H // 2 - 90
+        screen.fill(BACKGROUND)
+
+        title = title_font.render(
+            "SnapDisplay",
+            True,
+            WHITE,
         )
-    )
 
-    virtual.blit(
-        version,
-        (
-            RENDER_W // 2 - version.get_width() // 2,
-            RENDER_H // 2
+        version = small_font.render(
+            f"Version {VERSION}",
+            True,
+            GRAY,
         )
-    )
 
-    virtual.blit(
-        status,
-        (
-            RENDER_W // 2 - status.get_width() // 2,
-            RENDER_H // 2 + 60
+        status = small_font.render(
+            "Waiting for Home Assistant...",
+            True,
+            BLUE,
         )
-    )
 
-    # Scale to the display
-    pygame.transform.smoothscale(
-        virtual,
-        (SCREEN_W, SCREEN_H),
-        screen
-    )
+        screen.blit(
+            title,
+            (
+                screen_width // 2 - title.get_width() // 2,
+                screen_height // 2 - 90,
+            ),
+        )
 
-    pygame.display.flip()
-    clock.tick(60)
+        screen.blit(
+            version,
+            (
+                screen_width // 2 - version.get_width() // 2,
+                screen_height // 2,
+            ),
+        )
 
-pygame.quit()
-sys.exit()
+        screen.blit(
+            status,
+            (
+                screen_width // 2 - status.get_width() // 2,
+                screen_height // 2 + 60,
+            ),
+        )
+
+        pygame.display.flip()
+        clock.tick(config.get("display.fps", 60))
+
+    pygame.quit()
+    sys.exit()
+
+
+if __name__ == "__main__":
+    main()
