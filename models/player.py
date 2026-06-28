@@ -34,7 +34,16 @@ class Player:
 
         self.album = attributes.get("media_album_name", "")
 
-        self.picture = attributes.get("entity_picture", "")
+        #
+        # Prefer Home Assistant's cached artwork.
+        # Fall back to the original artwork URL.
+        #
+
+        self.picture = (
+            attributes.get("entity_picture_local")
+            or attributes.get("entity_picture")
+            or ""
+        )
 
         self.volume = attributes.get("volume_level", 0)
 

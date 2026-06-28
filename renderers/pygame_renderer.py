@@ -1,3 +1,4 @@
+import os
 import pygame
 
 BACKGROUND = (8, 8, 8)
@@ -51,11 +52,30 @@ class Renderer:
             24
         )
 
-    def draw_text(self, font, text, colour, y):
+        self.artwork = None
+
+        artwork_file = "assets/test.jpg"
+
+        if os.path.exists(artwork_file):
+
+            try:
+
+                image = pygame.image.load(artwork_file)
+
+                self.artwork = pygame.transform.smoothscale(
+                    image,
+                    (300, 300)
+                )
+
+            except Exception as e:
+
+                print(e)
+
+                self.artwork = None
+
+    def draw_text(self, font, text, colour, x, y):
 
         surface = font.render(text, True, colour)
-
-        x = self.screen.get_width() // 2 - surface.get_width() // 2
 
         self.screen.blit(surface, (x, y))
 
@@ -67,15 +87,43 @@ class Renderer:
             self.title_font,
             "SnapDisplay",
             WHITE,
+            40,
             40
         )
 
         self.draw_text(
             self.small_font,
-            "Version 0.3.0",
+            "Version 0.4.0",
             GRAY,
-            115
+            45,
+            110
         )
+
+        #
+        # Album artwork
+        #
+
+        if self.artwork:
+
+            self.screen.blit(
+                self.artwork,
+                (40, 170)
+            )
+
+        else:
+
+            pygame.draw.rect(
+                self.screen,
+                (50, 50, 50),
+                (40, 170, 300, 300),
+                2
+            )
+
+        #
+        # Metadata
+        #
+
+        text_x = 380
 
         if player is None:
 
@@ -83,7 +131,8 @@ class Renderer:
                 self.artist_font,
                 "Player Not Found",
                 RED,
-                260
+                text_x,
+                220
             )
 
         else:
@@ -92,28 +141,32 @@ class Renderer:
                 self.artist_font,
                 player.artist or "Unknown Artist",
                 WHITE,
-                220
+                text_x,
+                190
             )
 
             self.draw_text(
                 self.song_font,
                 player.title or "Unknown Title",
                 GREEN,
-                295
+                text_x,
+                255
             )
 
             self.draw_text(
                 self.small_font,
-                player.album,
+                player.album or "",
                 GRAY,
-                350
+                text_x,
+                315
             )
 
             self.draw_text(
                 self.small_font,
                 player.state.capitalize(),
                 GRAY,
-                430
+                text_x,
+                390
             )
 
         pygame.display.flip()
