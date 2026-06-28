@@ -1,6 +1,8 @@
 import json
 import websocket
 
+from models.player import Player
+
 
 class HomeAssistant:
 
@@ -34,7 +36,7 @@ class HomeAssistant:
 
         return reply["type"] == "auth_ok"
 
-    def get_entity(self, entity_id):
+    def get_player(self, entity_id):
 
         self.ws.send(json.dumps({
             "id": self.msgid,
@@ -53,6 +55,10 @@ class HomeAssistant:
             for entity in reply["result"]:
 
                 if entity["entity_id"] == entity_id:
-                    return entity
+
+                    player = Player()
+                    player.update(entity)
+
+                    return player
 
             return None
