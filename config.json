@@ -1,14 +1,16 @@
 {
     "homeassistant": {
-        "url": "http://YOUR_HA_IP:8123",
-        "token": ""
+        "url": "http://192.168.0.26:8123",
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIzMmQ1MTQ1ZGY5NDE0YjlhYmY2MDdhZDM4YjJjY2FjYyIsImlhdCI6MTc4MjYwODc2NSwiZXhwIjoyMDk3OTY4NzY1fQ.Uqre63Gy8H2ourdgHUrz_9GGxcIjJu5lAkWLKGX8zYI"
     },
-
-    "music_player": "media_player.living_room",
 
     "display": {
         "fullscreen": true,
         "idle_timeout": 30,
         "fps": 60
+    },
+
+    "musicassistant": {
+        "player": "media_player.BPM2Z"
     }
 }

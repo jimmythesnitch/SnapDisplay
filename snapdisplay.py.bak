@@ -3,64 +3,41 @@
 import os
 import sys
 
-# Prevent SDL from stealing the audio device.
+# Configure SDL BEFORE importing pygame.
 os.environ["SDL_AUDIODRIVER"] = "dummy"
 
 import pygame
 
 from core.config import Config
-from providers.homeassistant import HomeAssistant
 
-VERSION = "0.1.2"
+VERSION = "0.1.1"
 
 BACKGROUND = (8, 8, 8)
 WHITE = (255, 255, 255)
 GRAY = (180, 180, 180)
-GREEN = (80, 220, 120)
 BLUE = (120, 220, 255)
-RED = (220, 80, 80)
 
 
 def main():
-
     config = Config()
-
-    status_text = "Connecting to Home Assistant..."
-    status_colour = BLUE
-
-    try:
-        ha = HomeAssistant(
-            config.get("homeassistant.url"),
-            config.get("homeassistant.token")
-        )
-
-        if ha.connect():
-            status_text = "Connected to Home Assistant!"
-            status_colour = GREEN
-        else:
-            status_text = "Authentication Failed!"
-            status_colour = RED
-
-    except Exception as e:
-        print(e)
-        status_text = "Unable to connect!"
-        status_colour = RED
 
     pygame.init()
 
     display = pygame.display.Info()
+    screen_width = display.current_w
+    screen_height = display.current_h
 
     screen = pygame.display.set_mode(
-        (display.current_w, display.current_h),
-        pygame.FULLSCREEN
+        (screen_width, screen_height),
+        pygame.FULLSCREEN,
     )
 
     pygame.display.set_caption("SnapDisplay")
 
+    clock = pygame.time.Clock()
+
     title_font = pygame.font.SysFont("DejaVu Sans", 60, bold=True)
     small_font = pygame.font.SysFont("DejaVu Sans", 28)
-
-    clock = pygame.time.Clock()
 
     running = True
 
@@ -81,43 +58,43 @@ def main():
         title = title_font.render(
             "SnapDisplay",
             True,
-            WHITE
+            WHITE,
         )
 
         version = small_font.render(
             f"Version {VERSION}",
             True,
-            GRAY
+            GRAY,
         )
 
         status = small_font.render(
-            status_text,
+            "Waiting for Home Assistant...",
             True,
-            status_colour
+            BLUE,
         )
 
         screen.blit(
             title,
             (
-                display.current_w // 2 - title.get_width() // 2,
-                display.current_h // 2 - 90
-            )
+                screen_width // 2 - title.get_width() // 2,
+                screen_height // 2 - 90,
+            ),
         )
 
         screen.blit(
             version,
             (
-                display.current_w // 2 - version.get_width() // 2,
-                display.current_h // 2
-            )
+                screen_width // 2 - version.get_width() // 2,
+                screen_height // 2,
+            ),
         )
 
         screen.blit(
             status,
             (
-                display.current_w // 2 - status.get_width() // 2,
-                display.current_h // 2 + 60
-            )
+                screen_width // 2 - status.get_width() // 2,
+                screen_height // 2 + 60,
+            ),
         )
 
         pygame.display.flip()
