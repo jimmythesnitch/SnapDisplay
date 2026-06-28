@@ -11,7 +11,7 @@ import pygame
 from core.config import Config
 from providers.homeassistant import HomeAssistant
 
-VERSION = "0.1.2"
+VERSION = "0.1.3"
 
 BACKGROUND = (8, 8, 8)
 WHITE = (255, 255, 255)
@@ -25,25 +25,44 @@ def main():
 
     config = Config()
 
-    status_text = "Connecting to Home Assistant..."
+    status_text = "Connecting..."
     status_colour = BLUE
 
     try:
+
         ha = HomeAssistant(
             config.get("homeassistant.url"),
             config.get("homeassistant.token")
         )
 
         if ha.connect():
-            status_text = "Connected to Home Assistant!"
-            status_colour = GREEN
+
+            entity = ha.get_entity(
+                config.get("musicassistant.player")
+            )
+
+            if entity:
+
+                state = entity.get("state", "unknown")
+
+                status_text = f"Player State: {state}"
+                status_colour = GREEN
+
+            else:
+
+                status_text = "Player Not Found"
+                status_colour = RED
+
         else:
-            status_text = "Authentication Failed!"
+
+            status_text = "Authentication Failed"
             status_colour = RED
 
     except Exception as e:
+
         print(e)
-        status_text = "Unable to connect!"
+
+        status_text = str(e)
         status_colour = RED
 
     pygame.init()
@@ -57,8 +76,16 @@ def main():
 
     pygame.display.set_caption("SnapDisplay")
 
-    title_font = pygame.font.SysFont("DejaVu Sans", 60, bold=True)
-    small_font = pygame.font.SysFont("DejaVu Sans", 28)
+    title_font = pygame.font.SysFont(
+        "DejaVu Sans",
+        60,
+        bold=True
+    )
+
+    small_font = pygame.font.SysFont(
+        "DejaVu Sans",
+        28
+    )
 
     clock = pygame.time.Clock()
 
@@ -121,7 +148,10 @@ def main():
         )
 
         pygame.display.flip()
-        clock.tick(config.get("display.fps", 60))
+
+        clock.tick(
+            config.get("display.fps", 60)
+        )
 
     pygame.quit()
     sys.exit()
