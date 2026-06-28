@@ -1,0 +1,14 @@
+{
+    "homeassistant": {
+        "url": "http://YOUR_HA_IP:8123",
+        "token": ""
+    },
+
+    "music_player": "media_player.living_room",
+
+    "display": {
+        "fullscreen": true,
+        "idle_timeout": 30,
+        "fps": 60
+    }
+}
